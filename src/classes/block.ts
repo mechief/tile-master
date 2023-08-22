@@ -1,18 +1,16 @@
-import type { SlotState } from "./board";
-
 import { 
   TILE_EMPTY,
   TILE_FILLED,
   DEFAULT_BLOCK_TILE_COUNT 
 } from "../constants/block";
 
-type TileState = typeof TILE_EMPTY | typeof TILE_FILLED;
+export type TileState = typeof TILE_EMPTY | typeof TILE_FILLED;
 
 interface BlockInitOption {
   tileCount?: number;
 }
 
-interface TileCoordinate {
+export interface TileCoordinate {
   row: number;
   col: number;
 }
@@ -22,12 +20,15 @@ export default class Block {
   boardId?: number;
   tileCount: number;
   tileMap: TileState[][];
+  tileCoords: TileCoordinate[];
 
   constructor(option?: BlockInitOption) {
     this.blockId = 1;
     this.tileCount = option?.tileCount || this.generateRandomTileCount();
 
-    this.tileMap = this.createTileMap();
+    const { tileMap, tileCoords } = this.createTileMap();
+    this.tileMap = tileMap;
+    this.tileCoords = tileCoords;
   }
 
   private generateRandomTileCount(): number {
@@ -35,8 +36,8 @@ export default class Block {
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
 
-  private createTileMap(): TileState[][] {
-    const tileCoords: TileCoordinate[] = [];
+  private createTileMap(): { tileMap: TileState[][], tileCoords: TileCoordinate[] } {
+    let tileCoords: TileCoordinate[] = [];
     
     let _tileCount = 0;
     let position: TileCoordinate = { row: 0, col: 0 };
@@ -54,7 +55,7 @@ export default class Block {
       let newPosition = this.getNewTilePosition(position);
       
       while (this.checkIsInCoords(tileCoords, newPosition)) {
-        newPosition = this.getNewTilePosition(position); 
+        newPosition = this.getNewTilePosition(position);
       }
 
       position = { ...newPosition };
@@ -68,11 +69,20 @@ export default class Block {
       Array.from({ length: maxCol + minusRangeCol + 1 }, () => TILE_EMPTY)
     );
 
-    tileCoords.forEach(tileCoord => {
-      tileMap[tileCoord.row + minusRangeRow][tileCoord.col + minusRangeCol] = TILE_FILLED;
+    tileCoords = tileCoords.map(tileCoord => {
+      const newCoord: TileCoordinate = {
+        row: tileCoord.row + minusRangeRow,
+        col: tileCoord.col + minusRangeCol
+      }
+      tileMap[newCoord.row][newCoord.col] = TILE_FILLED;
+
+      return newCoord;
     });
 
-    return tileMap;
+    return {
+      tileMap,
+      tileCoords
+    };
   }
 
   private getNewTilePosition(currentPosition: TileCoordinate): TileCoordinate {
@@ -104,6 +114,10 @@ export default class Block {
     });
   }
 
+  private getIsPositionFilled(position: TileCoordinate): boolean {
+    return this.tileMap[position.row][position.col] === TILE_FILLED;
+  }
+
   public renderBlock(el: HTMLElement): void {
     let html = '';
     const rows = this.tileMap.map(row => row.join(' '));
@@ -113,13 +127,5 @@ export default class Block {
     });
 
     el.innerHTML = html;
-  }
-
-  static checkIsBlockUsableAtBoard(slotMap: SlotState[][], tileMap: TileState[][]): boolean {
-    for(let row = 0; row < slotMap.length; row++) {
-
-    }
-
-    return true;
   }
 }

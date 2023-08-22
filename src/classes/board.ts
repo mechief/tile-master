@@ -1,3 +1,5 @@
+import type Block from "./block";
+
 import { 
   SLOT_CLOSED,
   SLOT_OPENED,
@@ -17,7 +19,7 @@ interface BoardInitOption {
   slotCount?: number,
 }
 
-interface BoardCoordinate {
+export interface BoardCoordinate {
   row: number;
   col: number;
 }
@@ -134,5 +136,46 @@ export default class Board {
     });
 
     el.innerHTML = html;
+  }
+  
+  // 블록이 보드에 장착 가능한 모양인지 체크
+  getBlockUsableTopLeftCoords(block: Block): BoardCoordinate[] {
+    const coords: BoardCoordinate[] = [];
+    
+    const tileMap = block.tileMap;
+    const tileRows = tileMap.length;
+    const tileCols = tileMap[0].length;
+
+    // 타일 그리드의 좌상단 좌표 기준 타일이 넘치지 않는 영역을 변수에 담음
+    const maxRowIndex = this.size.rows - tileRows;
+    const maxColIndex = this.size.cols - tileCols;
+    
+    const tileCoords = block.tileCoords;
+
+    // slotMap의 좌표를 순회하며 해당 좌표가 타일 그리드의 좌상단일 때에 장착 가능한지 확인
+    for (let row = 0; row <= maxRowIndex; row++) {
+      for (let col = 0; col <= maxColIndex; col++) {
+        const position: BoardCoordinate = { row, col };
+        let isUsable = true;
+
+        for (const tileCoord of tileCoords) {
+          const isSlotted = this.getIsPositionSlotted(this.slotMap, {
+            row: position.row + tileCoord.row,
+            col: position.col + tileCoord.col,
+          });
+
+          if (!isSlotted) {
+            isUsable = false;
+            break;
+          }
+        }
+        
+        if (isUsable) {
+          coords.push(position);
+        }
+      }
+    }
+
+    return coords;
   }
 }
