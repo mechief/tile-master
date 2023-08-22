@@ -1,0 +1,50 @@
+!.gitignore
+.aws
+.bash_history
+.bash_logout
+.bash_profile
+.bashrc
+.emacs
+.config
+.DS_Store
+.idea
+.gnome2
+.mozilla
+.mysql_history
+.pki
+.settings
+.ssh
+.vim
+.viminfo
+.buildpath
+.project
+.svn
+.subversion
+.rediscli_history
+.vscode
+.history
+
+# backup file
+*.back
+*.backup
+
+*.swp
+
+vendor
+.env
+
+# node.js
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+node_modules
+
+# database
+dump.rdb
+
+# Ignore everything in the "dist" folder
+/dist/*
+
+# Except for the "_redirects" file
+!/dist/_redirects
+!/dist/index.html
