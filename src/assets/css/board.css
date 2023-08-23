@@ -21,8 +21,28 @@
   background: #f5f5f5;
 }
 
-.current-board {
+.board-editor {
+  position: relative;
   width: 66%;
+}
+
+.board-editor.mode-equipment:before {
+  content: "블록을 장착할 슬롯을 선택해 주세요.";
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  background-color: #fcffdf;
+  text-align: center;
+}
+
+.board-editor.mode-equipment:hover:before {
+  display: none;
 }
 
 .board {
@@ -55,16 +75,20 @@
   padding-bottom: 100%;
 }
 
-.board .cell .cell-inner[data-slot-state="0"] {
+.board .cell .cell-inner[data-slot-state="-1"] {
   background: #e1e1e1;
 }
 
-.board .cell .cell-inner[data-slot-state="1"] {
+.board .cell .cell-inner[data-slot-state="0"] {
   background: #fff;
 }
 
 .board .cell .cell-inner.usable {
   background-color: #d7ebf4;
+}
+
+.board .cell .cell-inner[data-slot-state="1"] {
+  background: #e8bfdb;
 }
 
 .block-inventory-wrap {
@@ -111,19 +135,19 @@
   padding-bottom: 100%;
 }
 
-.block .cell .cell-inner[data-tile-state="0"] {
+.block .cell .cell-inner[data-tile-state="-1"] {
   background: none;
 }
 
-.block .cell .cell-inner[data-tile-state="1"] {
+.block .cell .cell-inner[data-tile-state="0"] {
   border: 1px dashed #aaa;
   background: #fff;
 }
 
-.block.usable .cell .cell-inner[data-tile-state="1"] {
+.block.usable .cell .cell-inner[data-tile-state="0"] {
   background-color: #d7ebf4;
 }
 
-.block.active .cell .cell-inner[data-tile-state="1"] {
+.block.active .cell .cell-inner[data-tile-state="0"] {
   border-color: #206bf9;
 }

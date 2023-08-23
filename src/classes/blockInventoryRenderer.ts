@@ -1,12 +1,20 @@
 import type Block from "./block";
-import type Board from "./board";
+import type BoardEditorRenderer from "./boardEditorRenderer";
 
 import BlockRenderer from "./blockRenderer";
+
+import { 
+  SLOT_CLOSED,
+  SLOT_OPENED,
+  SLOT_EQUIPED
+} from "../constants/board";
  
 export default class BlockInventoryRenderer extends BlockRenderer {
+  protected targetBoardRenderer?: BoardEditorRenderer;
+
   protected afterRenderBlock(block: Block): void {
     if (this.targetBoard) {
-      const isUsable = this.targetBoard.getIsBlockUsable(block);
+      const isUsable = this.targetBoard.isBlockUsable(block);
       this.setBlockUsable(block, isUsable);
     }
 
@@ -17,13 +25,15 @@ export default class BlockInventoryRenderer extends BlockRenderer {
     const blockEl = this.getBlockEl(block);
 
     blockEl.addEventListener('click', () => {
+      if (this.targetBoard && this.targetBoardRenderer) {
+        this.targetBoardRenderer.clearHighlightUsableSlots(this.targetBoard);
+      }
+
+      const equipButton: HTMLElement = document.querySelector('#blockEquipButton')!;
+      equipButton.style.display = 'none';
+
       if (this.isActive(blockEl)) {
         this.unsetActive(blockEl);
-
-        if (this.targetBoard && this.targetBoardRenderer) {
-          this.targetBoardRenderer.clearHighlightUsableSlots(this.targetBoard);
-        }
-
         return;
       }
 
@@ -31,6 +41,17 @@ export default class BlockInventoryRenderer extends BlockRenderer {
       this.setActive(blockEl);
 
       if (this.targetBoard && this.targetBoardRenderer) {
+        const isUsable = this.isBlockUsable(block);
+
+        if (!isUsable) {
+          return;
+        }
+        
+        equipButton.style.display = 'inline-block';
+        equipButton.addEventListener('click', () => {
+          this.handleEquipButton(block);
+        });
+
         const usableCoords = this.targetBoard.getBlockUsableTopLeftCoords(block);
 
         this.targetBoardRenderer.highlightBlockUsableSlots({ 
@@ -58,5 +79,9 @@ export default class BlockInventoryRenderer extends BlockRenderer {
     this.el.querySelectorAll('.block.active').forEach(blockEl => {
       blockEl.classList.remove('active');
     });
+  }
+
+  private handleEquipButton(block: Block): void {
+    this.targetBoardRenderer?.setModeEquipment(block);
   }
 }

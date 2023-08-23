@@ -16,10 +16,10 @@ export default class BoardRenderer {
   }
   
   private renderBoard(board: Board): void {
-    const boardHtml = board.slotMap.map(row => {
-      const rowHtml = row.map(slotState => {
+    const boardHtml = board.slotMap.map((rowArray, row) => {
+      const rowHtml = rowArray.map((slotState, col) => {
         return `<div class="cell">
-          <div class="cell-inner" data-slot-state="${slotState}"></div>
+          <div class="cell-inner" data-row="${row}" data-col="${col}" data-slot-state="${slotState}"></div>
         </div>`;
       });
 
@@ -71,8 +71,20 @@ export default class BoardRenderer {
     const boardEl = this.getBoardEl(board);
     
     boardEl.querySelectorAll('.cell-inner.usable').forEach(cell => {
-      console.log(cell);
       cell.classList.remove('usable');
     });
+  }
+
+  protected updateSlotStates(board: Board): void {
+    const boardEl = this.getBoardEl(board);
+    const rows = boardEl.children;
+
+    for (let row = 0; row < rows.length; row++) {
+      const cols = rows[row].children;
+      for (let col = 0; col < cols.length; col++) {
+        const cellInnerEl = cols[col].children[0];
+        cellInnerEl.setAttribute('data-slot-state', ''+board.slotMap[row][col]);
+      }
+    }
   }
 }
