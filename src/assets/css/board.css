@@ -21,10 +21,13 @@
   background: #f5f5f5;
 }
 
+.current-board {
+  width: 66%;
+}
+
 .board {
   display: flex;
   flex-direction: column;
-  width: 66%;
   border: 1px solid #555;
 }
 
@@ -119,4 +122,8 @@
 
 .block.usable .cell .cell-inner[data-tile-state="1"] {
   background-color: #d7ebf4;
+}
+
+.block.active .cell .cell-inner[data-tile-state="1"] {
+  border-color: #206bf9;
 }

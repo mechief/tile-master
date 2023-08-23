@@ -1,16 +1,41 @@
 import type Block from "./block";
- 
+import type Board from "./board";
+import type BoardRenderer from "./boardRenderer";
+
+interface BlockRenderData {
+  readonly el: HTMLDivElement,
+  isUsable?: boolean;
+}
+
 export default class BlockRenderer {
-  el: HTMLElement;
-  blockElMap: { [key: number]: HTMLDivElement }
+  protected el: HTMLElement;
+  protected blockMap: { [key: string]: BlockRenderData }
+  protected targetBoard?: Board;
+  protected targetBoardRenderer?: BoardRenderer;
 
   constructor(el: HTMLElement) {
     this.el = el;
-    this.blockElMap = {};
+    this.blockMap = {};
   }
 
-  public renderBlock(block: Block): void {
-    const rowsHtml = block.tileMap.map(row => {
+  public renderBlock(
+    { block, targetBoard, targetBoardRenderer }
+    : { block: Block, targetBoard?: Board, targetBoardRenderer?: BoardRenderer }
+  ): void {
+    this.createBlockElement(block);
+
+    if (targetBoard) {
+      this.targetBoard = targetBoard;
+    }
+    if (targetBoardRenderer) {
+      this.targetBoardRenderer = targetBoardRenderer;
+    }
+
+    this.afterRenderBlock(block);
+  }
+
+  protected createBlockElement(block: Block): void {
+    const blockHtml = block.tileMap.map(row => {
       const rowHtml = row.map(tileState => {
         return `<div class="cell">
           <div class="cell-inner" data-tile-state="${tileState}"></div>
@@ -24,14 +49,33 @@ export default class BlockRenderer {
 
     node.classList.add('block');
     node.setAttribute('data-block-id', String(block.id));
-    node.innerHTML = rowsHtml;
+    node.innerHTML = blockHtml;
 
-    this.blockElMap[block.id] = node;
+    this.setBlock(block, node);
 
     this.el.append(node);
   }
+  
+  private setBlock(block: Block, el: HTMLDivElement): void {
+    this.blockMap[block.id] = { el };
+  }
 
-  public setUsable(block: Block): void {
-    this.blockElMap[block.id].classList.add('usable');
+  protected getBlockEl(block: Block): HTMLDivElement {
+    return this.blockMap[block.id].el;
+  }
+
+  protected isBlockUsable(block: Block): boolean {
+    return this.blockMap[block.id].isUsable === true;
+  }
+
+  protected setBlockUsable(block: Block, isUsable: boolean): void {
+    this.blockMap[block.id].isUsable = isUsable;
+
+    if (isUsable) {
+      this.getBlockEl(block).classList.add('usable');
+    }
+  }
+
+  protected afterRenderBlock(block: Block): void {
   }
 }
