@@ -10,25 +10,34 @@ interface BlockInitOption {
   tileCount?: number;
 }
 
+export interface BlockSize {
+  rows: number,
+  cols: number,
+}
+
 export interface TileCoordinate {
   row: number;
   col: number;
 }
 
 export default class Block {
-  blockId: number;
+  readonly id: number;
+  
+  readonly size: BlockSize;
+  readonly tileCount: number;
+  readonly tileMap: TileState[][];
+  readonly tileCoords: TileCoordinate[];
+  
   boardId?: number;
-  tileCount: number;
-  tileMap: TileState[][];
-  tileCoords: TileCoordinate[];
 
   constructor(option?: BlockInitOption) {
-    this.blockId = 1;
+    this.id = new Date().getTime();
     this.tileCount = option?.tileCount || this.generateRandomTileCount();
 
-    const { tileMap, tileCoords } = this.createTileMap();
+    const { tileMap, tileCoords, size } = this.createTileMap();
     this.tileMap = tileMap;
     this.tileCoords = tileCoords;
+    this.size = size;
   }
 
   private generateRandomTileCount(): number {
@@ -36,7 +45,8 @@ export default class Block {
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
 
-  private createTileMap(): { tileMap: TileState[][], tileCoords: TileCoordinate[] } {
+  private createTileMap()
+    : { tileMap: TileState[][], tileCoords: TileCoordinate[], size: BlockSize } {
     let tileCoords: TileCoordinate[] = [];
     
     let _tileCount = 0;
@@ -79,9 +89,15 @@ export default class Block {
       return newCoord;
     });
 
+    const size = {
+      rows: tileMap.length,
+      cols: tileMap[0].length
+    };
+
     return {
       tileMap,
-      tileCoords
+      tileCoords,
+      size
     };
   }
 
@@ -127,5 +143,9 @@ export default class Block {
     });
 
     el.innerHTML = html;
+  }
+
+  public setBoardId(boardId: number): void {
+    this.boardId = boardId;
   }
 }

@@ -8,11 +8,19 @@
 </head>
 <body>
     <div id="root">
-      <div id="board"></div>
-      <br>
-      <br>
-      <br>
-      <div id="block"></div>
+      <div id="gameView" class="game-view">
+        <div class="board-wrap">
+          <div id="board" class="board"></div>
+          <div id="boardStatus" class="board-status"></div>
+        </div>
+        <div class="block-inventory-wrap">
+          <h2 class="block-inventory-title">블록</h2>
+          <button type="button" id="blockButton">새로운 블록 생성</button>
+          <br>
+          <br>
+          <div id="blockInventory" class="block-inventory"></div>
+        </div>
+      </div>
     </div>
     <script src="/dist/app.js"></script>
 </body>

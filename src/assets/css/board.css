@@ -1,3 +1,122 @@
-.usable {
-  color: blue;
+#root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+}
+
+.game-view {
+  width: 800px;
+  max-width: 100%;
+}
+
+.board-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+.board-status {
+  width: calc(33% - 20px);
+  background: #f5f5f5;
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+  width: 66%;
+  border: 1px solid #555;
+}
+
+.board .row {
+  display: flex;
+  flex: 1 1 100%;
+}
+
+.board .row:nth-child(n+2) {
+  border-top: 1px dashed #aaa;
+}
+
+.board .cell {
+  flex: 1 1 auto;
+  text-align: center;
+}
+
+.board .cell:nth-child(n+2) {
+  border-left: 1px dashed #aaa;
+}
+
+.board .cell .cell-inner {
+  position: relative;
+  height: 0;
+  padding-bottom: 100%;
+}
+
+.board .cell .cell-inner[data-slot-state="0"] {
+  background: #e1e1e1;
+}
+
+.board .cell .cell-inner[data-slot-state="1"] {
+  background: #fff;
+}
+
+.board .cell .cell-inner.usable {
+  background-color: #d7ebf4;
+}
+
+.block-inventory-wrap {
+  margin-top: 30px;
+  padding: 16px 24px;
+  background: #f9f1e6;
+}
+
+.block-inventory-title {
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 24px;
+}
+
+.block-inventory {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start
+}
+
+.block .row {
+  display: flex;
+  flex: 0 1 auto;
+}
+
+.block .cell {
+  flex: 1 1 auto;
+  width: 30px;
+  text-align: center;
+}
+
+.block .cell .cell-inner {
+  position: relative;
+  height: 0;
+  padding-bottom: 100%;
+}
+
+.block .cell .cell-inner[data-tile-state="0"] {
+  background: none;
+}
+
+.block .cell .cell-inner[data-tile-state="1"] {
+  border: 1px dashed #aaa;
+  background: #fff;
+}
+
+.block.usable .cell .cell-inner[data-tile-state="1"] {
+  background-color: #d7ebf4;
 }

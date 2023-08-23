@@ -1,23 +1,39 @@
 import Board from "./classes/board";
 import BoardRenderer from "./classes/boardRenderer";
 import Block from "./classes/block";
+import BlockRenderer from "./classes/blockRenderer";
 
 const board = new Board();
 const block = new Block();
 
-const boardEl = document.getElementById('board');
-const blockEl = document.getElementById('block');
+const boardEl = document.getElementById('board')!;
+const blockInventoryEl = document.getElementById('blockInventory')!;
 
-if (boardEl) {
-  BoardRenderer.renderBoard({ el: boardEl, board: board });
+const blockInventoryRenderer = new BlockRenderer(blockInventoryEl);
 
-  const usableCoords = board.getBlockUsableTopLeftCoords(block);
-  BoardRenderer.highlightBlockUsableSlots({ 
-    el: boardEl, 
-    usableCoords: usableCoords, 
-    tileCoords: block.tileCoords
-  });
+BoardRenderer.renderBoard({ el: boardEl, board: board });
+blockInventoryRenderer.renderBlock(block);
+
+const usableCoords = board.getBlockUsableTopLeftCoords(block);
+if (usableCoords.length > 0) {
+  blockInventoryRenderer.setUsable(block);
 }
-if (blockEl) {
-  block.renderBlock(blockEl);
-}
+
+BoardRenderer.highlightBlockUsableSlots({ 
+  el: boardEl, 
+  usableCoords: usableCoords, 
+  tileCoords: block.tileCoords
+});
+
+// board.equipBlock(block);
+
+// 블록 생성 버튼
+document.querySelector('#blockButton')?.addEventListener('click', function() {
+  const _block = new Block();
+  blockInventoryRenderer.renderBlock(_block);
+
+  const isUsable = board.getIsBlockUsable(_block);
+  if (isUsable) {
+    blockInventoryRenderer.setUsable(_block);
+  }
+});

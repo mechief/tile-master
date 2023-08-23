@@ -6,17 +6,18 @@ import {
   DEFAULT_BOARD_SIZE,
   DEFAULT_BOARD_SLOT_COUNT
 } from "../constants/board";
+import { TileCoordinate } from "./block";
 
 export type SlotState = typeof SLOT_CLOSED | typeof SLOT_OPENED;
-
-export interface BoardSize {
-  rows: number,
-  cols: number,
-}
 
 interface BoardInitOption {
   size?: BoardSize,
   slotCount?: number,
+}
+
+export interface BoardSize {
+  rows: number,
+  cols: number,
 }
 
 export interface BoardCoordinate {
@@ -25,18 +26,24 @@ export interface BoardCoordinate {
 }
 
 export default class Board {
-  boardId: number;
-  size: BoardSize;
-  slotCount: number;
-  slotMap: SlotState[][];
+  readonly id: number;
+
+  readonly size: BoardSize;
+  readonly slotCount: number;
+  readonly slotMap: SlotState[][];
+
+  blocks: Block[];
+  
   userId?: number;
 
   constructor(option?: BoardInitOption) {
-    this.boardId = 1;
+    this.id = 1;
     this.size = option?.size || DEFAULT_BOARD_SIZE;
     this.slotCount = option?.slotCount || DEFAULT_BOARD_SLOT_COUNT;
 
     this.slotMap = this.createSlottedBoard();
+
+    this.blocks = [];
   }
 
   private createSlottedBoard(): SlotState[][] {
@@ -112,6 +119,27 @@ export default class Board {
     return slotMap[position.row][position.col] === SLOT_OPENED;
   }
 
+  private checkIsBlockUsableAtPosition(
+    { tileCoords, position }
+    : { tileCoords: TileCoordinate[], position: BoardCoordinate }
+  ): boolean {
+    let isUsable = true;
+
+    for (const tileCoord of tileCoords) {
+      const isSlotted = this.getIsPositionSlotted(this.slotMap, {
+        row: position.row + tileCoord.row,
+        col: position.col + tileCoord.col,
+      });
+
+      if (!isSlotted) {
+        isUsable = false;
+        break;
+      }
+    }
+
+    return isUsable;
+  }
+
   private pickRandomSlottedPosition(slotMap: SlotState[][]): BoardCoordinate {
     const slottedPosition: BoardCoordinate[] = [];
 
@@ -127,49 +155,45 @@ export default class Board {
     return slottedPosition[randomIndex];
   }
 
-  public renderBoard(el: HTMLElement): void {
-    let html = '';
-    const rows = this.slotMap.map(row => row.join(' '));
-    
-    rows.forEach(slotText => {
-      html += slotText + '<br>';
-    });
-
-    el.innerHTML = html;
-  }
-  
   // 블록이 보드에 장착 가능한 모양인지 체크
-  getBlockUsableTopLeftCoords(block: Block): BoardCoordinate[] {
-    const coords: BoardCoordinate[] = [];
-    
-    const tileMap = block.tileMap;
-    const tileRows = tileMap.length;
-    const tileCols = tileMap[0].length;
-
-    // 타일 그리드의 좌상단 좌표 기준 타일이 넘치지 않는 영역을 변수에 담음
-    const maxRowIndex = this.size.rows - tileRows;
-    const maxColIndex = this.size.cols - tileCols;
-    
+  public getIsBlockUsable(block: Block): boolean {
     const tileCoords = block.tileCoords;
+
+    // 타일 그리드의 좌상단 좌표 기준 타일이 넘치지 않는 영역
+    const maxRowIndex = this.size.rows - block.size.rows;
+    const maxColIndex = this.size.cols - block.size.cols;
 
     // slotMap의 좌표를 순회하며 해당 좌표가 타일 그리드의 좌상단일 때에 장착 가능한지 확인
     for (let row = 0; row <= maxRowIndex; row++) {
       for (let col = 0; col <= maxColIndex; col++) {
         const position: BoardCoordinate = { row, col };
-        let isUsable = true;
 
-        for (const tileCoord of tileCoords) {
-          const isSlotted = this.getIsPositionSlotted(this.slotMap, {
-            row: position.row + tileCoord.row,
-            col: position.col + tileCoord.col,
-          });
-
-          if (!isSlotted) {
-            isUsable = false;
-            break;
-          }
+        const isUsable = this.checkIsBlockUsableAtPosition({ tileCoords, position });
+        if (isUsable) {
+          return true;
         }
-        
+      }
+    }
+
+    return false;
+  }
+  
+  // 블록이 보드에 장착 가능한 전체 위치 가져오기
+  public getBlockUsableTopLeftCoords(block: Block): BoardCoordinate[] {
+    const coords: BoardCoordinate[] = [];
+    
+    const tileCoords = block.tileCoords;
+
+    // 타일 그리드의 좌상단 좌표 기준 타일이 넘치지 않는 영역
+    const maxRowIndex = this.size.rows - block.size.rows;
+    const maxColIndex = this.size.cols - block.size.cols;
+
+    // slotMap의 좌표를 순회하며 해당 좌표가 타일 그리드의 좌상단일 때에 장착 가능한지 확인
+    for (let row = 0; row <= maxRowIndex; row++) {
+      for (let col = 0; col <= maxColIndex; col++) {
+        const position: BoardCoordinate = { row, col };
+
+        const isUsable = this.checkIsBlockUsableAtPosition({ tileCoords, position });
         if (isUsable) {
           coords.push(position);
         }
@@ -177,5 +201,18 @@ export default class Board {
     }
 
     return coords;
+  }
+
+  private checkIsBlockEquiped(block: Block): boolean {
+    return this.blocks.some(equipedBlock => equipedBlock.id === block.id);
+  }
+
+  public equipBlock(block: Block): void {
+    if (this.checkIsBlockEquiped(block)) {
+      return;
+    }
+
+    block.setBoardId(this.id);
+    this.blocks.push(block);
   }
 }
