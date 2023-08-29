@@ -3,12 +3,6 @@ import type BoardEditorRenderer from "./boardEditorRenderer";
 
 import BlockRenderer from "./blockRenderer";
 
-import { 
-  SLOT_CLOSED,
-  SLOT_OPENED,
-  SLOT_EQUIPED
-} from "../constants/board";
- 
 export default class BlockInventoryRenderer extends BlockRenderer {
   protected targetBoardRenderer?: BoardEditorRenderer;
 

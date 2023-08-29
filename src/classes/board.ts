@@ -55,11 +55,16 @@ export default class Board {
   }
 
   public isPositionSlotted(position: BoardCoordinate, slotMap?: SlotState[][]): boolean {
-    if (slotMap) {
-      return slotMap[position.row][position.col] !== SLOT_CLOSED;
-    }
+    const _slotMap = slotMap ?? this.slotMap;
 
-    return this.slotMap [position.row][position.col] !== SLOT_CLOSED;
+    return _slotMap[position.row][position.col] !== SLOT_CLOSED;
+  }
+
+  // 슬롯이 열려있는 빈 칸인지 확인
+  public isPositionOpened(position: BoardCoordinate, slotMap?: SlotState[][]): boolean {
+    const _slotMap = slotMap ?? this.slotMap;
+
+    return _slotMap[position.row][position.col] === SLOT_OPENED;
   }
 
   // 블록이 보드에 장착 가능한 모양인지 체크
@@ -106,6 +111,28 @@ export default class Board {
     return isUsable;
   }
 
+  // 블록을 장착 가능한지 확인 (슬롯 열림 및 다른 블록과 충돌 없는지 확인)
+  public isBlockEquippableAtPosition(
+    { tileCoords, position }
+    : { tileCoords: TileCoordinate[], position: BoardCoordinate }
+  ): boolean {
+    let isUsable = true;
+
+    for (const tileCoord of tileCoords) {
+      const isOpened = this.isPositionOpened({
+        row: position.row + tileCoord.row,
+        col: position.col + tileCoord.col,
+      });
+
+      if (!isOpened) {
+        isUsable = false;
+        break;
+      }
+    }
+
+    return isUsable;
+  }
+
   // 블록이 보드에 장착 가능한 전체 위치 가져오기
   public getBlockUsableTopLeftCoords(block: Block): BoardCoordinate[] {
     const coords: BoardCoordinate[] = [];
@@ -135,15 +162,18 @@ export default class Board {
     return this.equipedBlocks.some(equipedBlock => equipedBlock.block.id === block.id);
   }
 
-  public equipBlock({ block, position }: { block: Block, position: BoardCoordinate }): void {
-    if (this.checkIsBlockEquiped(block)) {
-      return;
+  public equipBlock({ block, position }: { block: Block, position: BoardCoordinate }): boolean {
+    if (this.checkIsBlockEquiped(block) 
+      || !this.isBlockEquippableAtPosition({ tileCoords: block.tileCoords, position: position })) {
+      return false;
     }
 
     this.updateSlotMap({ block, position });
     this.equipedBlocks.push({ block, position });
     
     block.setBoardId(this.id);
+
+    return true;
   }
 
   private updateSlotMap({ block, position }: { block: Block, position: BoardCoordinate }): void {

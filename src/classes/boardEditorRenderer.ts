@@ -57,9 +57,12 @@ export default class BoardEditorRenderer extends BoardRenderer {
         });
 
         if (isUsable) {
-          this.board.equipBlock({ block: this.currentBlock, position: position });
-          this.updateSlotStates(this.board);
-          this.setModeDefault();
+          const equipResult = this.board.equipBlock({ block: this.currentBlock, position: position });
+
+          if (equipResult) {
+            this.updateSlotStates(this.board);
+            this.setModeDefault();
+          }
         }
       }
     });
