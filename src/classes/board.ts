@@ -3,6 +3,8 @@ import type { TileCoordinate } from "./block";
 
 import BoardSlotGenerator from "./boardSlotGenerator";
 
+import { randomId } from "../utils/uniqueId";
+
 import { 
   SLOT_CLOSED,
   SLOT_OPENED,
@@ -19,8 +21,8 @@ export interface BoardInitOption {
 }
 
 export interface BoardSize {
-  rows: number,
-  cols: number,
+  readonly rows: number,
+  readonly cols: number,
 }
 
 export interface BoardCoordinate {
@@ -33,10 +35,26 @@ interface BlockEquipmentState {
   position: BoardCoordinate,
 }
 
-export default class Board {
-  public readonly id: number;
+export interface BoardNewData {
+  code: string;
 
-  private readonly size: BoardSize;
+  size: BoardSize;
+  slotCount: number;
+  slotMap: SlotState[][];
+
+  equipedBlocks: BlockEquipmentState[];
+}
+
+export interface BoardData extends BoardNewData {
+  id?: number;
+  userId?: number;
+}
+
+export default class Board {
+  public readonly id?: number;
+  public readonly code: string;
+
+  public readonly size: BoardSize;
   private readonly slotCount: number;
   public readonly slotMap: SlotState[][];
 
@@ -44,14 +62,55 @@ export default class Board {
   
   private userId?: number;
 
-  constructor(option?: BoardInitOption) {
-    this.id = 1;
-    this.size = option?.size || DEFAULT_BOARD_SIZE;
-    this.slotCount = option?.slotCount || DEFAULT_BOARD_SLOT_COUNT;
+  constructor({ data, option }: { data?: BoardData, option?: BoardInitOption } = {}) {
+    // 기존 데이터로 instance 생성
+    if (data) {
+      this.id = data.id;
+      this.code = data.code;
+      this.size = data.size;
+      this.slotCount = data.slotCount;
+      this.slotMap = data.slotMap;
+      this.equipedBlocks = data.equipedBlocks;
+      this.userId = data.userId;
 
-    this.slotMap = BoardSlotGenerator.createSlottedBoard({ size: this.size, slotCount: this.slotCount });
+      return;
+    } else {
+      // 새로운 board instance 생성
+      this.code = randomId(8);
+      this.size = option?.size || DEFAULT_BOARD_SIZE;
+      this.slotCount = option?.slotCount || DEFAULT_BOARD_SLOT_COUNT;
+  
+      this.slotMap = BoardSlotGenerator.createSlottedBoard({ size: this.size, slotCount: this.slotCount });
+  
+      this.equipedBlocks = [];
+    }
+  }
 
-    this.equipedBlocks = [];
+  public getNewBoardData(): BoardNewData {
+    return {
+      code: this.code,
+      size: this.size,
+      slotCount: this.slotCount,
+      slotMap: this.slotMap,
+      equipedBlocks: this.equipedBlocks,
+    }
+  }
+
+  public getBoardData(): BoardData {
+    const data: BoardData = {...this.getNewBoardData()};
+    
+    if (this.id) {
+      data.id = this.id;
+    }
+    if (this.userId) {
+      data.userId = this.userId;
+    }
+
+    return data;
+  }
+
+  public getStateOfPosition(position: BoardCoordinate): SlotState {
+    return this.slotMap[position.row][position.col];
   }
 
   public isPositionSlotted(position: BoardCoordinate, slotMap?: SlotState[][]): boolean {
@@ -171,7 +230,7 @@ export default class Board {
     this.updateSlotMap({ block, position });
     this.equipedBlocks.push({ block, position });
     
-    block.setBoardId(this.id);
+    // block.setBoardId(this.id);
 
     return true;
   }

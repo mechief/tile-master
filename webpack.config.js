@@ -4,7 +4,7 @@ module.exports = {
   name: 'tilemaster',
   mode: 'development', // 서비스: production
   devtool: 'eval',
-  entry: './src/index.ts',
+  entry: './src/app.tsx',
   module: {
     rules: [
       {

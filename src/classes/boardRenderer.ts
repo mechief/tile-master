@@ -1,7 +1,7 @@
 import type Board from "./board";
 import type { BoardCoordinate } from "./board";
 import type { TileCoordinate } from "./block";
- 
+
 export default class BoardRenderer {
   protected el: HTMLElement;
   protected boardElMap: { [key: string]: HTMLDivElement }
@@ -29,7 +29,7 @@ export default class BoardRenderer {
     const node = document.createElement('div');
 
     node.classList.add('board');
-    node.setAttribute('data-board-id', String(board.id));
+    node.setAttribute('data-board-id', String(board.code));
     node.innerHTML = boardHtml;
 
     this.setBoardEl(board, node);
@@ -38,11 +38,11 @@ export default class BoardRenderer {
   }
 
   protected getBoardEl(board: Board): HTMLDivElement {
-    return this.boardElMap[board.id];
+    return this.boardElMap[board.code];
   }
 
   private setBoardEl(board: Board, el: HTMLDivElement): void {
-    this.boardElMap[board.id] = el;
+    this.boardElMap[board.code] = el;
   }
 
   // 블록을 장착 가능한 보드 슬롯을 하이라이트

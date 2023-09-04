@@ -1,6 +1,6 @@
 {
   "name": "tile-master",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -11,17 +11,28 @@
     "url": "git+https://mechief@github.com/mechief/tile-master.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "mechief",
   "license": "None",
   "bugs": {
     "url": "https://github.com/mechief/tile-master/issues"
   },
   "homepage": "https://github.com/mechief/tile-master#readme",
   "devDependencies": {
+    "@types/styled-components": "^5.1.26",
     "ts-loader": "^9.4.4",
     "typescript": "^5.1.6",
     "webpack": "^5.88.2",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.9.5",
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "@types/react-redux": "^7.1.26",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-redux": "^8.1.2",
+    "styled-components": "^6.0.7"
   }
 }

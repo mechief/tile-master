@@ -20,6 +20,17 @@ export interface TileCoordinate {
   col: number;
 }
 
+export interface BlockData {
+  readonly id: number;
+  
+  readonly size: BlockSize;
+  readonly tileCount: number;
+  readonly tileMap: TileState[][];
+  readonly tileCoords: TileCoordinate[];
+  
+  boardId?: number;
+}
+
 export default class Block {
   readonly id: number;
   
@@ -30,14 +41,38 @@ export default class Block {
   
   boardId?: number;
 
-  constructor(option?: BlockInitOption) {
-    this.id = new Date().getTime();
-    this.tileCount = option?.tileCount || this.generateRandomTileCount();
+  constructor({ data, option }: { data?: BlockData, option?: BlockInitOption } = {}) {
+    if (data) {
+      this.id = data.id;
+      this.tileCount = data.tileCount;
+      this.tileMap = data.tileMap;
+      this.tileCoords = data.tileCoords;
+      this.size = data.size;
+    } else {
+      this.id = new Date().getTime();
+      this.tileCount = option?.tileCount || this.generateRandomTileCount();
+  
+      const { tileMap, tileCoords, size } = this.createTileMap();
+      this.tileMap = tileMap;
+      this.tileCoords = tileCoords;
+      this.size = size;
+    }
+  }
 
-    const { tileMap, tileCoords, size } = this.createTileMap();
-    this.tileMap = tileMap;
-    this.tileCoords = tileCoords;
-    this.size = size;
+  public getBlockData(): BlockData {
+    const data: BlockData = {
+      id: this.id,
+      size: this.size,
+      tileCount: this.tileCount,
+      tileMap: this.tileMap,
+      tileCoords: this.tileCoords,
+    };
+    
+    if (this.boardId) {
+      data.boardId = this.boardId;
+    }
+
+    return data;
   }
 
   private generateRandomTileCount(): number {
@@ -124,28 +159,19 @@ export default class Block {
     return newPosition;
   }
 
+  public getPositionState(position: TileCoordinate): TileState {
+    return this.tileMap[position.row][position.col];
+  }
+
   private checkIsInCoords(coords: TileCoordinate[], position: TileCoordinate): boolean {
     return coords.some(coord => {
       return coord.row === position.row && coord.col === position.col;
     });
   }
 
-  private getIsPositionFilled(position: TileCoordinate): boolean {
-    return this.tileMap[position.row][position.col] === TILE_FILLED;
-  }
-
-  public renderBlock(el: HTMLElement): void {
-    let html = '';
-    const rows = this.tileMap.map(row => row.join(' '));
-    
-    rows.forEach(slotText => {
-      html += slotText + '<br>';
-    });
-
-    el.innerHTML = html;
-  }
-
+  /*
   public setBoardId(boardId: number): void {
     this.boardId = boardId;
   }
+  */
 }
