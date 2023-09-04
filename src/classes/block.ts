@@ -38,6 +38,8 @@ export default class Block {
   readonly tileCount: number;
   readonly tileMap: TileState[][];
   readonly tileCoords: TileCoordinate[];
+
+  isUsable: boolean;
   
   boardId?: number;
 
@@ -57,6 +59,8 @@ export default class Block {
       this.tileCoords = tileCoords;
       this.size = size;
     }
+
+    this.isUsable = false;
   }
 
   public getBlockData(): BlockData {
@@ -167,6 +171,10 @@ export default class Block {
     return coords.some(coord => {
       return coord.row === position.row && coord.col === position.col;
     });
+  }
+
+  public setUsable(usable: boolean): void {
+    this.isUsable = usable;
   }
 
   /*

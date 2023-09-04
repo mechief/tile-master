@@ -1,24 +1,25 @@
-import React, { useMemo } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
 import styled from "styled-components";
-import { RootState } from "../../reducers";
+import { useAppDispatch } from "../../store/store";
 
-import Board from "../../classes/board";
+import type Board from "../../classes/board";
 
-import type { BoardsMap } from "../../slices/inventorySlice";
+import { setBoardId } from "../../slices/boardEditorSlice";
 
-import BoardWithDetail from "./BoardWithDetail";
+import BoardItem from "../../components/board/BoardItem";
 
-const BoardEditor = () => {
-  const boards = useSelector<RootState, BoardsMap>(state => state.inventory.boards);
-
-  const boardData = boards[Object.keys(boards)[0]];
-
-  const board = useMemo(() => new Board({ data: boardData }), [boardData]);
+const BoardEditor = ({ board }: { board: Board }) => {
+  const dispatch = useAppDispatch();
+  
+  useEffect(() => {
+    dispatch(setBoardId(board.id || null));
+  }, [board]);
 
   return (
     <StyledBoardEditor>
-      <BoardWithDetail board={board} />
+      {board && 
+        <BoardItem board={board} />
+      }
     </StyledBoardEditor>
   );
 }

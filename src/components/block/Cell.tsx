@@ -1,11 +1,11 @@
-import React from "react";
+import React, { memo } from "react";
 import styled from "styled-components";
 
 import Tile from "./Tile";
 
 import type Block from "../../classes/block";
 
-const Cell = ({ block, row, col }: { block: Block, row: number, col: number }) => {
+const Cell = memo(({ block, row, col }: { block: Block, row: number, col: number }) => {
   return (
     <StyledCell>
       <Tile 
@@ -15,7 +15,7 @@ const Cell = ({ block, row, col }: { block: Block, row: number, col: number }) =
       ></Tile>
     </StyledCell>
   );
-}
+});
 
 const StyledCell = styled.div`
   flex: 1 1 auto;

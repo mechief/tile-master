@@ -7,7 +7,7 @@ import { useAppDispatch } from "../../store/store";
 import { earnBoard } from "../../actions/inventory";
 import { setScene } from "../../slices/sceneSlice";
 
-import BoardWithDetail from "../../components/board/BoardWithDetail";
+import BoardItem from "../../components/board/BoardItem";
 
 import { SCENE_EDITOR_BOARD } from "../../constants/scene";
 
@@ -37,7 +37,7 @@ const SceneChooseItem = () => {
       <ChooseList>
         {boards.map((board, i) => 
           <ChooseItem key={`choose_board_${i}`}>
-            <BoardWithDetail board={board} />
+            <BoardItem board={board} />
             <ButtonWrap>
               <Button type="button" onClick={() => handleClickItem(board)}>선택</Button>
             </ButtonWrap>

@@ -5,7 +5,7 @@ import type Board from "../../classes/board";
 
 import Row from "./Row";
 
-const BoardWithDetail = ({ board }: { board: Board }) => {
+const BoardItem = ({ board }: { board: Board }) => {
   return (
     <StyledBoard>
       {new Array(board.size.rows).fill(0).map((_, i) => 
@@ -21,4 +21,4 @@ const StyledBoard = styled.div`
   border: 1px solid #555;
 `;
 
-export default BoardWithDetail;
+export default BoardItem;

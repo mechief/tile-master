@@ -1,13 +1,14 @@
 import { combineReducers } from '@reduxjs/toolkit';
 
+import { editorReducer } from './editor';
+
 import sceneSlice from '../slices/sceneSlice';
 import inventorySlice from '../slices/inventorySlice';
-import boardEditorSlice from '../slices/boardEditorSlice';
 
 export const reducer = combineReducers({
   scene: sceneSlice.reducer,
   inventory: inventorySlice.reducer,
-  boardEditor: boardEditorSlice.reducer,
+  editor: editorReducer
 });
 
 export type RootState = ReturnType<typeof reducer>;
